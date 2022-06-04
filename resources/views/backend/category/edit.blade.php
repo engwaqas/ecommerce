@@ -4,16 +4,20 @@
         <div class="col-12">
             <div class="card card-primary">
                 <div class="card-header">
-                    <h3 class="card-title">Add Category</h3>
+                    <div class="d-flex">
+                        <h3 class="card-title">Update Category</h3>
+                        <a href="{{route('category.index')}}">{{__Categories}}</a>
+                    </div>
                 </div>
                 <!-- /.card-header -->
                 <!-- form start -->
-                <form action="{{route('category.store')}}" method="POST" enctype="multipart/form-data">
+                <form action="{{route('category.update')}}" method="POST" enctype="multipart/form-data">
                     @csrf
+                    <input type="hidden" name="category_id" value="{{$category->id}}">
                     <div class="card-body">
                         <div class="form-group">
                             <label for="title">Category Title</label>
-                            <input name="title" type="text" class="form-control" id="title" placeholder="Category Title">
+                            <input name="title" type="text" class="form-control" id="title" placeholder="Category Title" value="{{$category->title}}">
                         </div>
                         <div class="form-group">
                             <label for="image">File input</label>
@@ -27,11 +31,14 @@
                                 </div> --}}
                             </div>
                         </div>
+                        <div class="form-group">
+                            <img src="{{asset('images').'/'.$category->image}}" alt="" width="100">
+                        </div>
                     </div>
                     <!-- /.card-body -->
 
                     <div class="card-footer">
-                        <button type="submit" class="btn btn-primary">Save Category</button>
+                        <button type="submit" class="btn btn-primary">Update Category</button>
                     </div>
                 </form>
             </div>
