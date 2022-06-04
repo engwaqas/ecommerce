@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Str;
 class CategoryController extends Controller
 {
     /**
@@ -14,8 +14,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $category = Category::all();
-        return view('categories.index', compact('category'));
+        $categories = Category::all();
+        return view('backend.category.index', compact('categories'));
     }
 
     /**
@@ -38,25 +38,25 @@ class CategoryController extends Controller
     {
         $request->validate([
                 'title' => 'required|string|min:4',
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ],[
             'title.min' => 'Enter Atleast 4 Character'
         ]);
         $category = new category();
         $category->title = $request->title;
+        $category->slug = Str::slug($request->title);
+
+        if($request->file('image')){
+            $imageName = time().'.'.$request->image->extension();
+            $request->image->move(public_path('images'), $imageName);
+            $category->image = $imageName;
+        }
         $category->save();
-        return redirect()->route('category.index')->with('toast_success','Category added');
+        return back()->with('toast_success','Category added');
+//        return redirect()->route('category.index')->with('toast_success','Category added');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Category  $category
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Category $category)
-    {
-        //
-    }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -66,7 +66,7 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        return view('categories.edit',compact('category'));
+        return view('backend.category.edit',compact('category'));
     }
 
     /**
@@ -81,12 +81,22 @@ class CategoryController extends Controller
         $request->validate([
             'category_id' => 'required',
             'title' => 'required|string|min:4',
+            'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
     ],[
         'title.min' => 'Enter Atleast 4 Character'
     ]);
         $category = Category::find($request->category_id);
+        if(empty($category)){
+            return back()->with('toast_error','Category not found');
+        }
         $category->title = $request->title;
-        $category->update();
+        $category->slug = Str::slug($request->title);
+        if($request->file('image')){
+            $imageName = time().'.'.$request->image->extension();
+            $request->image->move(public_path('images'), $imageName);
+            $category->image = $imageName;
+        }
+        $category->save();
         return redirect()->route('category.index')->with('toast_success','Category updated');
     }
 
